@@ -1,0 +1,25 @@
+import pandas as pd
+
+# Load the flight data from a CSV file
+df = pd.read_csv('flights.csv')
+
+# Ensure that the date column is in datetime format
+df['date'] = pd.to_datetime(df['date'])
+
+# Extract month from the date column
+df['month'] = df['date'].dt.month
+
+# Group by month and destination, then count the occurrences
+monthly_popularity = df.groupby(['month', 'destination']).size().reset_index(name='count')
+
+# For each month, find the destination with the maximum count
+most_popular_airports = monthly_popularity.loc[monthly_popularity.groupby('month')['count'].idxmax()]
+
+# Rename columns for better readability
+most_popular_airports = most_popular_airports.rename(columns={'destination': 'Most Popular Airport', 'count': 'Flights Count'})
+
+# Display the results
+print(most_popular_airports)
+
+# Save the results to a new CSV file
+most_popular_airports.to_csv('most_popular_airports_by_month.csv', index=False)
